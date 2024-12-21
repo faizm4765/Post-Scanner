@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/go-ping/ping"
+	probing "github.com/prometheus-community/pro-bing"
 )
 
 func main() {
 	println("Hello, I am a custom port scanner!")
-	pinger, err := ping.NewPinger("example.com")
+	pinger, err := probing.NewPinger("example.com")
 	if err != nil {
 		panic(err)
 	}
