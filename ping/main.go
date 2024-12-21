@@ -21,5 +21,3 @@ func main() {
 	fmt.Printf("Ping packets received: %d\n", stats.PacketsRecv)
 	fmt.Printf("Ping packets lost: %d\n", stats.PacketsSent-stats.PacketsRecv)
 }
-
-// Agar is file ko execute krna hai toh running go run main.go outside ping directory wont work. First come inside the ping directory and then run go run main.go
