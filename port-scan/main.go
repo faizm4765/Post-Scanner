@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"strconv"
 )
 
 func main() {
@@ -17,23 +18,29 @@ func main() {
 	host := *hostName
 	port := *portNumber
 
-	fmt.Println("Host: ", host)
-	fmt.Println("Host: ", port)
+	// fmt.Println("Host: ", host)
+	// fmt.Println("Port: ", port)
 
-	if port == "" {
-		conn, err := net.Dial("tcp", host+":"+port)
+	if port != "" {
+		conn, err := net.Dial("tcp", host+":"+"1433")
 		if err != nil {
 			fmt.Println("Error while connecting to host: ", err)
 			return
+		} else {
+			fmt.Println("Port open: ", 1433)
 		}
 		conn.Close()
 	} else {
-		for port := 1; port <= 1024; port++ {
+		fmt.Println("Scanning host: ", host)
+		for port := 1; port < 65536; port++ {
+			port := strconv.Itoa(port)
+			// fmt.Println("Scanning port: ", port)
 			conn, err := net.Dial("tcp", host+":"+string(port))
 			if err != nil {
-				fmt.Println("Port closed: ", port)
+				// fmt.Println("Port closed: ", port)
 				continue
 			}
+
 			fmt.Println("Port open: ", port)
 			conn.Close()
 		}
