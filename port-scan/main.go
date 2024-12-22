@@ -33,9 +33,9 @@ func main() {
 	} else {
 		fmt.Println("Scanning host: ", host)
 		for port := 1; port < 65536; port++ {
-			port := strconv.Itoa(port)
 			// fmt.Println("Scanning port: ", port)
-			conn, err := net.Dial("tcp", host+":"+string(port))
+			address := net.JoinHostPort(host, strconv.Itoa(port))
+			conn, err := net.Dial("tcp", address)
 			if err != nil {
 				// fmt.Println("Port closed: ", port)
 				continue
