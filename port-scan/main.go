@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 )
 
 func main() {
@@ -18,4 +19,13 @@ func main() {
 
 	fmt.Println("Host: ", host)
 	fmt.Println("Host: ", port)
+	conn, err := net.Dial("tcp", host+":"+port)
+	if err != nil {
+		fmt.Println("Error while connecting to host: ", err)
+		return
+	}
+
+	fmt.Println("Scanning host: ", host)
+	fmt.Println("Port open: ", port)
+	conn.Close()
 }
