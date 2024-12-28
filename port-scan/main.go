@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -32,17 +33,29 @@ func main() {
 		conn.Close()
 	} else {
 		fmt.Println("Scanning host: ", host)
-		for port := 1; port < 65536; port++ {
+		for port := 1; port < 1024; port++ {
 			// fmt.Println("Scanning port: ", port)
-			address := net.JoinHostPort(host, strconv.Itoa(port))
-			conn, err := net.Dial("tcp", address)
-			if err != nil {
-				// fmt.Println("Port closed: ", port)
-				continue
-			}
-
-			fmt.Println("Port open: ", port)
-			conn.Close()
+			portScan(host, port)
 		}
+	}
+}
+
+func portScan(host string, port int) {
+	address := net.JoinHostPort(host, strconv.Itoa(port))
+	conn, err := net.DialTimeout("tcp", address, 5*time.Second)
+	if err != nil {
+		// fmt.Println("Port closed: ", port)
+		if oppErr, ok := err.(*net.OpError); ok {
+			if oppErr.Timeout() {
+				fmt.Printf("Timeout error: on %v . %v", port, err)
+			} else {
+				// Port is closed
+				// fmt.Printf("Error while connecting to port %v . %v: ", port, err)
+				// fmt.Printf("Port closed: %v\n", port)
+			}
+		}
+	} else {
+		fmt.Println("Port open: ", port)
+		defer conn.Close()
 	}
 }
