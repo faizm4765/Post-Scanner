@@ -33,21 +33,27 @@ func main() {
 		conn.Close()
 	} else {
 		fmt.Println("Scanning host: ", host)
+		result := make(chan string)
 		for port := 1; port < 1024; port++ {
 			// fmt.Println("Scanning port: ", port)
-			portScan(host, port)
+			go portScan(host, port, result)
+		}
+
+		for i := 1; i < 1024; i++ {
+			fmt.Println(<-result)
 		}
 	}
 }
 
-func portScan(host string, port int) {
+func portScan(host string, port int, result chan string) {
 	address := net.JoinHostPort(host, strconv.Itoa(port))
 	conn, err := net.DialTimeout("tcp", address, 5*time.Second)
 	if err != nil {
 		// fmt.Println("Port closed: ", port)
 		if oppErr, ok := err.(*net.OpError); ok {
 			if oppErr.Timeout() {
-				fmt.Printf("Timeout error: on %v . %v", port, err)
+				// fmt.Printf("Timeout error: on %v . %v", port, err)
+				result <- fmt.Sprintf("Timeout error: on %v . %v", port, err)
 			} else {
 				// Port is closed
 				// fmt.Printf("Error while connecting to port %v . %v: ", port, err)
@@ -55,7 +61,8 @@ func portScan(host string, port int) {
 			}
 		}
 	} else {
-		fmt.Println("Port open: ", port)
+		// fmt.Println("Port open: ", port)
+		result <- fmt.Sprintf("Port open: %v", port)
 		defer conn.Close()
 	}
 }
