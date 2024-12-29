@@ -32,6 +32,7 @@ func main() {
 		}
 		conn.Close()
 	} else {
+		curTime := time.Now()
 		fmt.Println("Scanning host: ", host)
 		result := make(chan string)
 		for port := 1; port < 1024; port++ {
@@ -39,15 +40,18 @@ func main() {
 			go portScan(host, port, result)
 		}
 
-		for i := 1; i < 1024; i++ {
+		for i := 1; i < 65536; i++ {
 			fmt.Println(<-result)
 		}
+
+		timeTaken := time.Since(curTime)
+		fmt.Println("Time taken: ", timeTaken)
 	}
 }
 
 func portScan(host string, port int, result chan string) {
 	address := net.JoinHostPort(host, strconv.Itoa(port))
-	conn, err := net.DialTimeout("tcp", address, 5*time.Second)
+	conn, err := net.DialTimeout("tcp", address, 2*time.Second)
 	if err != nil {
 		// fmt.Println("Port closed: ", port)
 		if oppErr, ok := err.(*net.OpError); ok {
@@ -56,6 +60,7 @@ func portScan(host string, port int, result chan string) {
 				result <- fmt.Sprintf("Timeout error: on %v . %v", port, err)
 			} else {
 				// Port is closed
+				result <- fmt.Sprintf("Port closed: %v . %v", port, err)
 				// fmt.Printf("Error while connecting to port %v . %v: ", port, err)
 				// fmt.Printf("Port closed: %v\n", port)
 			}
